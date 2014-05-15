@@ -72,5 +72,20 @@ class Vingcard(Packet):
     ]
 
 
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(sys.argv[0])
+    parser.add_argument('dump', metavar="FILE", nargs=1, type=argparse.FileType('rb'))
+    args = parser.parse_args(sys.argv[1:])
+    try:
+        Vingcard(args.dump[0].read()).show2()
+    except:
+        print >> sys.stderr, "Input file does not seem to be a valid Vingcard dump"
+    finally:
+        args.dump[0].close()
+    sys.exit(0)
+
 # vim:ts=4:expandtab:sw=4
 
