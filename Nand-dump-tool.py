@@ -30,6 +30,57 @@ class NandId(object):
         0xec: "Samsung",
     }
 
+    _devid = {
+        0x6e: "NAND 1MiB 5V 8-bit",
+        0x64: "NAND 2MiB 5V 8-bit",
+        0x6b: "NAND 4MiB 5V 8-bit",
+        0xe8: "NAND 1MiB 3,3V 8-bit",
+        0xec: "NAND 1MiB 3,3V 8-bit",
+        0xea: "NAND 2MiB 3,3V 8-bit",
+        0xd5: "NAND 4MiB 3,3V 8-bit",
+        0xe3: "NAND 4MiB 3,3V 8-bit",
+        0xe5: "NAND 4MiB 3,3V 8-bit",
+        0xd6: "NAND 8MiB 3,3V 8-bit",
+        0x39: "NAND 8MiB 1,8V 8-bit",
+        0xe6: "NAND 8MiB 3,3V 8-bit",
+        0x33: "NAND 16MiB 1,8V 8-bit",
+        0x73: "NAND 16MiB 3,3V 8-bit",
+        0x35: "NAND 32MiB 1,8V 8-bit",
+        0x75: "NAND 32MiB 3,3V 8-bit",
+        0x36: "NAND 64MiB 1,8V 8-bit",
+        0x76: "NAND 64MiB 3,3V 8-bit",
+        0x78: "NAND 128MiB 1,8V 8-bit",
+        0x39: "NAND 128MiB 1,8V 8-bit",
+        0x79: "NAND 128MiB 3,3V 8-bit",
+        0x71: "NAND 256MiB 3,3V 8-bit",
+        0xa2: "NAND 64MiB 1,8V 8-bit",
+        0xa0: "NAND 64MiB 1,8V 8-bit",
+        0xf2: "NAND 64MiB 3,3V 8-bit",
+        0xd0: "NAND 64MiB 3,3V 8-bit",
+        0xf0: "NAND 64MiB 3,3V 8-bit",
+        0xa1: "NAND 128MiB 1,8V 8-bit",
+        0xf1: "NAND 128MiB 3,3V 8-bit",
+        0xd1: "NAND 128MiB 3,3V 8-bit",
+        0xaa: "NAND 256MiB 1,8V 8-bit",
+        0xda: "NAND 256MiB 3,3V 8-bit",
+        0xac: "NAND 512MiB 1,8V 8-bit",
+        0xdc: "NAND 512MiB 3,3V 8-bit",
+        0xa3: "NAND 1GiB 1,8V 8-bit",
+        0xd3: "NAND 1GiB 3,3V 8-bit",
+        0xa5: "NAND 2GiB 1,8V 8-bit",
+        0xd5: "NAND 2GiB 3,3V 8-bit",
+        0xa7: "NAND 4GiB 1,8V 8-bit",
+        0xd7: "NAND 4GiB 3,3V 8-bit",
+        0xae: "NAND 8GiB 1,8V 8-bit",
+        0xde: "NAND 8GiB 3,3V 8-bit",
+        0x1a: "NAND 16GiB 1,8V 8-bit",
+        0x3a: "NAND 16GiB 3,3V 8-bit",
+        0x1c: "NAND 32GiB 1,8V 8-bit",
+        0x3c: "NAND 32GiB 3,3V 8-bit",
+        0x1e: "NAND 64GiB 1,8V 8-bit",
+        0x3e: "NAND 64GiB 3,3V 8-bit",
+    }
+
     _serial_access_time = {
         0: 50e-9,
         1: 30e-9,
@@ -68,11 +119,15 @@ class NandId(object):
     def oob_size(self):
         return self.spare_size * self.page_size / 512
 
+    @property
+    def deviceStr(self):
+        return self._devid[self.deviceId] if self.deviceId in self._devid else "Unknown (0x%02x)" % self.deviceId
+
     def __repr__(self):
         rv = []
         rv.append("ID code                          : %08x" % self.idcode)
         rv.append("Manufacturer                     : %s" % self.manufStr)
-        rv.append("Device                           : 0x%02x" % self.deviceId)
+        rv.append("Device                           : %s" % self.deviceStr)
         rv.append("Die/Package                      : %d" % self.die)
         rv.append("Cell type                        : %d Level Cell" % self.cell)
         rv.append("Simultaneously programmed paged  : %d" % self.prog_pages)
