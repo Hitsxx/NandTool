@@ -17,6 +17,8 @@ import argparse
 
 
 class NandId(object):
+    ## Lookup tables are taken from SpritesMods' work: http://spritesmods.com/?art=ftdinand
+    ## and B. Kerler's improvements: https://github.com/bkerler/NANDReader_FTDI
     _manuf = {
         0x01: "AMD / Spansion",
         0x04: "Fujitsu",
