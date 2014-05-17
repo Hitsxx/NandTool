@@ -161,6 +161,7 @@ if __name__ == '__main__':
     parser.add_argument("--page-size", type=int, default=None, dest="page")
     parser.add_argument("--oob-size", type=int, default=None, dest="oob")
     parser.add_argument("--extract-oob", metavar="FILE", type=argparse.FileType('wb'), default=None, dest="oobfile")
+    parser.add_argument("--separate-oob", default=False, action="store_true", dest="separate")
 
     args = parser.parse_args(sys.argv[1:])
     if args.idcode is not None and (args.page is not None or args.oob is not None):
@@ -181,16 +182,24 @@ if __name__ == '__main__':
         print "Using given parameters: page of %d bytes separated by %d bytes OOB data" % (args.page, args.oob)
 
     cnt = { 'data': 0, 'oob': 0 }
+    oob_step = args.oob * 512 / args.page
     while True:
-        data = args.finput.read(args.page)
+        data = ""
+        oob = ""
+        if not args.separate:
+            data = args.finput.read(args.page)
+            oob = args.finput.read(args.oob)
+        else:
+            for i in range(0, args.page, 512):
+                data += args.finput.read(512)
+                oob += args.finput.read(oob_step)
         cnt['data'] += len(data)
-        args.foutput.write(data)
-        oob = args.finput.read(args.oob)
         cnt['oob'] += len(oob)
-        if oob == "":
-            break
+        args.foutput.write(data)
         if args.oobfile is not None:
             args.oobfile.write(oob)
+        if oob == "":
+            break
     args.finput.close()
     args.foutput.close()
     if args.oobfile is not None:
