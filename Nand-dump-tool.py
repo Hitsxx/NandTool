@@ -159,9 +159,9 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output", metavar="FILE", type=argparse.FileType('wb'), required=True, dest="foutput")
     parser.add_argument("-I", "--idcode", metavar="ID", default=None, dest="idcode", type=NandId)
     parser.add_argument("--page-size", type=int, default=None, dest="page")
-    parser.add_argument("--oob-size", type=int, default=None, dest="oob")
-    parser.add_argument("--extract-oob", metavar="FILE", type=argparse.FileType('wb'), default=None, dest="oobfile")
-    parser.add_argument("--separate-oob", default=False, action="store_true", dest="separate")
+    parser.add_argument("--oob-size", metavar="SIZE", type=int, default=None, dest="oob")
+    parser.add_argument("--save-oob", metavar="FILE", type=argparse.FileType('wb'), default=None, dest="oobfile")
+    parser.add_argument("--layout", default="adjacent", choices=["adjacent", "separate"], dest="layout")
 
     args = parser.parse_args(sys.argv[1:])
     if args.idcode is not None and (args.page is not None or args.oob is not None):
@@ -186,10 +186,10 @@ if __name__ == '__main__':
     while True:
         data = ""
         oob = ""
-        if not args.separate:
+        if args.layout == "separate":
             data = args.finput.read(args.page)
             oob = args.finput.read(args.oob)
-        else:
+        elif args.layout == "adjacent":
             for i in range(0, args.page, 512):
                 data += args.finput.read(512)
                 oob += args.finput.read(oob_step)
