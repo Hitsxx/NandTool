@@ -161,28 +161,55 @@ if __name__ == '__main__':
     parser.add_argument("--page-size", type=int, default=None, dest="page")
     parser.add_argument("--oob-size", metavar="SIZE", type=int, default=None, dest="oob")
     parser.add_argument("--save-oob", metavar="FILE", type=argparse.FileType('wb'), default=None, dest="oobfile")
-    parser.add_argument("--layout", default="adjacent", choices=["adjacent", "separate"], dest="layout")
+    parser.add_argument("--layout", default="adjacent", choices=["adjacent", "separate", "guess"], dest="layout")
 
     args = parser.parse_args(sys.argv[1:])
     if args.idcode is not None and (args.page is not None or args.oob is not None):
-        print >> sys.stderr, "You cannot specify an idcode and page/oob size at the same time"
+        print >> sys.stderr, "[!] You cannot specify an idcode and page/oob size at the same time"
         sys.exit(1)
 
     if args.idcode is None and (args.page is None or args.oob is None):
-        print >> sys.stderr, "You must specify either idcode or both page and oob sizes"
+        print >> sys.stderr, "[!] You must specify either idcode or both page and oob sizes"
         sys.exit(2)
 
     if args.idcode is not None:
         print ""
-        print "Using given ID code"
+        print "[*] Using given ID code"
         print repr(args.idcode)
         args.page = args.idcode.page_size
         args.oob = args.idcode.oob_size
     else:
-        print "Using given parameters: page of %d bytes separated by %d bytes OOB data" % (args.page, args.oob)
+        print "[*] Using given parameters: page of %d bytes separated by %d bytes OOB data" % (args.page, args.oob)
+
+    if args.layout == "guess":
+        print ""
+        print "[*] Guessing NAND layout using hamming distance..."
+        hamming_adj = hamming_sep = 0
+        oob_data_adj = []
+        oob_data_sep = []
+        oob_adj_size = args.oob / (args.page / 512)
+        while True:
+            data = args.finput.read(args.page + args.oob)
+            if data == "":
+                args.finput.seek(0)
+                break
+            oob_data_sep.append(data[args.page:])
+            tmp = ""
+            for i in range(0, args.page, 512):
+                tmp += data[i * (512 + oob_adj_size):(i * (512 + oob_adj_size)) + oob_adj_size]
+            oob_data_adj.append(tmp)
+        for i in range(len(oob_data_adj) - 1):
+            hamming_adj += sum([(ord(a) ^ ord(b)) != 0 for a,b in zip(oob_data_adj[i], oob_data_adj[i + 1])])
+            hamming_sep += sum([(ord(a) ^ ord(b)) != 0 for a,b in zip(oob_data_sep[i], oob_data_sep[i + 1])])
+        del oob_data_adj
+        del oob_data_sep
+        args.layout = "adjacent" if hamming_sep > hamming_adj else "separate"
+        print "[*] Guessed layout is: %s" % args.layout
 
     cnt = { 'data': 0, 'oob': 0 }
     oob_step = args.oob * 512 / args.page
+    print ""
+    print "[*] Start dumping..."
     while True:
         data = ""
         oob = ""
@@ -204,8 +231,7 @@ if __name__ == '__main__':
     args.foutput.close()
     if args.oobfile is not None:
         args.oobfile.close()
-    print ""
-    print "Status:"
+    print "[*] Finished"
     print "\tTotal: %d bytes (%.02f %s)" % prettify(cnt['data'] + cnt['oob'])
     print "\tData : %d bytes (%.02f %s)" % prettify(cnt['data'])
     print "\tOOB  : %d bytes (%.02f %s)" % prettify(cnt['oob'])
