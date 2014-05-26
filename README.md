@@ -49,3 +49,31 @@ positional arguments:
 optional arguments:
   -h, --help  show this help message and exit
 ```
+
+## Nand-dump-tool.py ##
+
+This script deals with NAND flash dumps, extracting the spare area out of a complete chip dump file.
+
+It allows you to specify either the chip parameters (page size and OOB size) or the chip ID code.
+
+By default it will split the dump against a **separate** layout but you can override that by explicitly specifying an **adjacent** layout or try the experimental **guess** layout. The script will first analyze the two possible layouts and use a Hamming distance to choose which one fits best.
+
+You can read more about that tool [on the related blog post](http://blog.j-michel.org)
+```
+#!sh
+
+usage: ./Nand-dump-tool.py [-h] -i FILE -o FILE [-I ID] [--page-size PAGE]
+                           [--oob-size SIZE] [--save-oob FILE]
+                           [--layout {adjacent,separate,guess}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i FILE, --input FILE
+  -o FILE, --output FILE
+  -I ID, --idcode ID
+  --page-size PAGE
+  --oob-size SIZE
+  --save-oob FILE
+  --layout {adjacent,separate,guess}
+```
+
