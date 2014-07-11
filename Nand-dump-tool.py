@@ -196,6 +196,8 @@ if __name__ == '__main__':
             if data == "":
                 args.finput.seek(0)
                 break
+            if data == "\xff" * (args.page + args.oob):
+                continue
             oob_data_sep.append(data[args.page:])
             tmp = ""
             for i in range(0, args.page, 512):
@@ -209,7 +211,7 @@ if __name__ == '__main__':
         args.layout = "adjacent" if hamming_sep > hamming_adj else "separate"
         print "[*] Guessed layout is: %s" % args.layout
 
-    cnt = { 'data': 0, 'oob': 0 }
+    cnt = { 'data': 0, 'oob': 0, 'empty': 0, 'total': 0 }
     oob_step = args.oob * 512 / args.page
     print ""
     print "[*] Start dumping..."
@@ -230,6 +232,9 @@ if __name__ == '__main__':
             args.oobfile.write(oob)
         if oob == "":
             break
+        cnt['total'] += 1
+        if data == "\xff" * len(data):
+            cnt['empty'] += 1
     args.finput.close()
     args.foutput.close()
     if args.oobfile is not None:
@@ -238,6 +243,8 @@ if __name__ == '__main__':
     print "\tTotal: %d bytes (%.02f %s)" % prettify(cnt['data'] + cnt['oob'])
     print "\tData : %d bytes (%.02f %s)" % prettify(cnt['data'])
     print "\tOOB  : %d bytes (%.02f %s)" % prettify(cnt['oob'])
+    percent = 100.0 * float(cnt['empty'])/float(cnt['total'])
+    print "\tClear: %0.2f%% of the flash is empty (%d pages out of %d)" % (percent, cnt['empty'], cnt['total'])
     sys.exit(0)
 
 # vim:ts=4:expandtab:sw=4
