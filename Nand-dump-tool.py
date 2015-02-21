@@ -32,6 +32,8 @@ class NandId(object):
         0x98: "Toshiba",
         0xad: "Hynix",
         0xc2: "Macronix",
+        0xd3: "Samsung",
+        0xdc: "Samsung",
         0xec: "Samsung",
     }
 
@@ -70,6 +72,7 @@ class NandId(object):
         0xda: "NAND 256MiB 3,3V 8-bit",
         0xac: "NAND 512MiB 1,8V 8-bit",
         0xdc: "NAND 512MiB 3,3V 8-bit",
+        0x10: "NAND 512MiB 3,3V 8-bit",
         0xa3: "NAND 1GiB 1,8V 8-bit",
         0xd3: "NAND 1GiB 3,3V 8-bit",
         0xa5: "NAND 2GiB 1,8V 8-bit",
