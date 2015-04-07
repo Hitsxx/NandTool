@@ -36,7 +36,7 @@ def rebuild_file(out_file, in_files, chunk_size=1024):
                                                                                                  elected[0][1],
                                                                                                  ord(elected[1][0]),
                                                                                                  elected[1][1])
-                print "\tArbitrary choosing '0x%02x'" % elected[0][0]
+                print "\tArbitrary choosing '0x%02x'" % ord(elected[0][0])
             out_data.append(c.most_common(1)[0][0])
         out_file.write("".join(out_data))
 
