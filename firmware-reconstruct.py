@@ -32,9 +32,9 @@ def rebuild_file(out_file, in_files, chunk_size=1024):
             c = Counter([x[byte_offset] for x in in_data])
             elected = c.most_common(2)
             if len(elected) == 2 and elected[0][1] == elected[1][1]:
-                print "Warning: ex-aequo candidates detected '0x%02x' (%d) and '0x%02x' (%d)" % (elected[0][0],
+                print "Warning: ex-aequo candidates detected '0x%02x' (%d) and '0x%02x' (%d)" % (ord(elected[0][0]),
                                                                                                  elected[0][1],
-                                                                                                 elected[1][0],
+                                                                                                 ord(elected[1][0]),
                                                                                                  elected[1][1])
                 print "\tArbitrary choosing '0x%02x'" % elected[0][0]
             out_data.append(c.most_common(1)[0][0])
